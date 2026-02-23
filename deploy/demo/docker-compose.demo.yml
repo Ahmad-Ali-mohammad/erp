@@ -1,0 +1,17 @@
+﻿services:
+  db:
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    ports:
+      - "8080:80"
+
+  backend:
+    command: >
+      sh -c "python manage.py migrate &&
+      if [ \"$$SEED_DEMO_DATA\" = \"true\" ]; then python manage.py seed_demo_data; fi &&
+      python manage.py runserver 0.0.0.0:8000 --noreload"
+
+  frontend:
+    command: ["npm", "run", "dev", "--", "-H", "0.0.0.0", "-p", "3000"]

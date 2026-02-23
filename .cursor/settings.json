@@ -1,0 +1,28 @@
+{
+  "plugins": {
+    "supabase": {
+      "enabled": true
+    },
+    "vercel": {
+      "enabled": true
+    },
+    "slack": {
+      "enabled": true
+    },
+    "linear": {
+      "enabled": true
+    },
+    "notion-workspace": {
+      "enabled": true
+    },
+    "clerk": {
+      "enabled": true
+    },
+    "prisma": {
+      "enabled": true
+    },
+    "cloudflare": {
+      "enabled": true
+    }
+  }
+}

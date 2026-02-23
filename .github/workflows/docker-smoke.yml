@@ -1,0 +1,157 @@
+name: Docker Smoke
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  postgres:
+    name: Docker Smoke (PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start stack (postgres mode)
+        run: docker compose --env-file .env.docker.postgres -f docker-compose.base.yml -f docker-compose.postgres.yml up -d --build
+
+      - name: Wait for endpoints
+        run: |
+          wait_http() {
+            local url="$1"
+            for i in $(seq 1 60); do
+              code=$(curl -s -o /dev/null -w "%{http_code}" "$url" || true)
+              if [ "$code" = "200" ]; then
+                echo "ready: $url"
+                return 0
+              fi
+              sleep 3
+            done
+            echo "timeout waiting for $url"
+            return 1
+          }
+          wait_http "http://localhost:8000/api/v1/core/health/"
+          wait_http "http://localhost:8000/api/schema/"
+          wait_http "http://localhost:3000/login"
+
+      - name: Verify demo login
+        run: |
+          status=$(curl -s -o token.json -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -d '{"username":"admin","password":"Admin@12345"}' \
+            http://localhost:8000/api/auth/token/)
+          if [ "$status" != "200" ]; then
+            cat token.json
+            exit 1
+          fi
+          python3 -c "import json; d=json.load(open('token.json')); assert d.get('access') and d.get('refresh')"
+
+      - name: Show compose status
+        if: always()
+        run: docker compose --env-file .env.docker.postgres -f docker-compose.base.yml -f docker-compose.postgres.yml ps
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --env-file .env.docker.postgres -f docker-compose.base.yml -f docker-compose.postgres.yml down -v --remove-orphans
+
+  mysql:
+    name: Docker Smoke (MySQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start stack (mysql mode)
+        run: docker compose --env-file .env.docker.mysql -f docker-compose.base.yml -f docker-compose.mysql.yml up -d --build
+
+      - name: Wait for endpoints
+        run: |
+          wait_http() {
+            local url="$1"
+            for i in $(seq 1 60); do
+              code=$(curl -s -o /dev/null -w "%{http_code}" "$url" || true)
+              if [ "$code" = "200" ]; then
+                echo "ready: $url"
+                return 0
+              fi
+              sleep 3
+            done
+            echo "timeout waiting for $url"
+            return 1
+          }
+          wait_http "http://localhost:8000/api/v1/core/health/"
+          wait_http "http://localhost:8000/api/schema/"
+          wait_http "http://localhost:3000/login"
+          wait_http "http://localhost:8080/"
+
+      - name: Verify demo login
+        run: |
+          status=$(curl -s -o token.json -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -d '{"username":"admin","password":"Admin@12345"}' \
+            http://localhost:8000/api/auth/token/)
+          if [ "$status" != "200" ]; then
+            cat token.json
+            exit 1
+          fi
+          python3 -c "import json; d=json.load(open('token.json')); assert d.get('access') and d.get('refresh')"
+
+      - name: Show compose status
+        if: always()
+        run: docker compose --env-file .env.docker.mysql -f docker-compose.base.yml -f docker-compose.mysql.yml ps
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --env-file .env.docker.mysql -f docker-compose.base.yml -f docker-compose.mysql.yml down -v --remove-orphans
+
+  sqlite:
+    name: Docker Smoke (SQLite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start stack (sqlite mode)
+        run: docker compose --env-file .env.docker.sqlite -f docker-compose.base.yml -f docker-compose.sqlite.yml up -d --build
+
+      - name: Wait for endpoints
+        run: |
+          wait_http() {
+            local url="$1"
+            for i in $(seq 1 60); do
+              code=$(curl -s -o /dev/null -w "%{http_code}" "$url" || true)
+              if [ "$code" = "200" ]; then
+                echo "ready: $url"
+                return 0
+              fi
+              sleep 3
+            done
+            echo "timeout waiting for $url"
+            return 1
+          }
+          wait_http "http://localhost:8000/api/v1/core/health/"
+          wait_http "http://localhost:8000/api/schema/"
+          wait_http "http://localhost:3000/login"
+
+      - name: Verify demo login
+        run: |
+          status=$(curl -s -o token.json -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -d '{"username":"admin","password":"Admin@12345"}' \
+            http://localhost:8000/api/auth/token/)
+          if [ "$status" != "200" ]; then
+            cat token.json
+            exit 1
+          fi
+          python3 -c "import json; d=json.load(open('token.json')); assert d.get('access') and d.get('refresh')"
+
+      - name: Show compose status
+        if: always()
+        run: docker compose --env-file .env.docker.sqlite -f docker-compose.base.yml -f docker-compose.sqlite.yml ps
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --env-file .env.docker.sqlite -f docker-compose.base.yml -f docker-compose.sqlite.yml down -v --remove-orphans

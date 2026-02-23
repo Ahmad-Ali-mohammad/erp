@@ -1,0 +1,59 @@
+name: Quality Gate
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "scripts/**"
+      - "docker-compose*.yml"
+      - ".env.docker.*"
+      - ".github/workflows/**"
+  push:
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "scripts/**"
+      - "docker-compose*.yml"
+      - ".env.docker.*"
+      - ".github/workflows/**"
+
+concurrency:
+  group: quality-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend Quality
+    uses: ./.github/workflows/backend-quality.yml
+    secrets: inherit
+
+  frontend:
+    name: Frontend Quality
+    uses: ./.github/workflows/frontend-quality.yml
+    secrets: inherit
+
+  docker_smoke:
+    name: Docker Smoke
+    uses: ./.github/workflows/docker-smoke.yml
+    secrets: inherit
+
+  required:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs:
+      - backend
+      - frontend
+      - docker_smoke
+    if: always()
+    steps:
+      - name: Validate quality jobs
+        run: |
+          echo "Backend result: ${{ needs.backend.result }}"
+          echo "Frontend result: ${{ needs.frontend.result }}"
+          echo "Docker smoke result: ${{ needs.docker_smoke.result }}"
+          if [[ "${{ needs.backend.result }}" != "success" || "${{ needs.frontend.result }}" != "success" || "${{ needs.docker_smoke.result }}" != "success" ]]; then
+            echo "Quality Gate failed."
+            exit 1
+          fi
+          echo "Quality Gate passed."

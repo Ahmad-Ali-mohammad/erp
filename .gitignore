@@ -1,0 +1,50 @@
+﻿# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Virtual env
+.venv/
+venv/
+
+# Django
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/*.log
+
+# Node
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+frontend/test-results/
+frontend/frontend.log
+frontend/tmpclaude-*
+
+# Env and secrets
+.env
+.env.*.local
+
+# Generated artifacts
+backups/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary scaffolding leftovers
+/finance/
+/finance_legacy/
+backend/finance/_probe.txt
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc
