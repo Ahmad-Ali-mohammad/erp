@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -7,6 +7,7 @@ import { FormEvent, useState } from "react";
 import { ApiError, login } from "@/lib/api-client";
 
 const ADMIN_USERNAME = "admin";
+const DEMO_ADMIN_PASSWORD = "Admin@12345";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
 
   const mutation = useMutation({
-    mutationFn: async () => login(ADMIN_USERNAME, password),
+    mutationFn: async (inputPassword: string) => login(ADMIN_USERNAME, inputPassword),
     onSuccess: () => {
       router.replace(nextPath);
       router.refresh();
@@ -30,7 +31,12 @@ export default function LoginPage() {
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    mutation.mutate();
+    mutation.mutate(password);
+  };
+
+  const quickLogin = () => {
+    setPassword(DEMO_ADMIN_PASSWORD);
+    mutation.mutate(DEMO_ADMIN_PASSWORD);
   };
 
   const errorMessage = mutation.error instanceof ApiError ? mutation.error.message : "";
@@ -62,9 +68,12 @@ export default function LoginPage() {
 
           {errorMessage ? <p className="error-banner">{errorMessage}</p> : null}
 
-          <div className="auth-actions">
+          <div className="auth-actions" style={{ display: "grid", gap: "0.6rem" }}>
             <button type="submit" className="btn btn-primary" disabled={mutation.isPending}>
               {mutation.isPending ? "جاري التحقق..." : "دخول بحساب المدير"}
+            </button>
+            <button type="button" className="btn btn-outline" onClick={quickLogin} disabled={mutation.isPending}>
+              دخول سريع (Demo)
             </button>
           </div>
         </form>
