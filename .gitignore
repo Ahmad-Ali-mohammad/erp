@@ -33,6 +33,9 @@ frontend/tmpclaude-*
 # Generated artifacts
 backups/
 dist/
+backend/runserver.err
+backend/runserver.log
+frontend/tsconfig.tsbuildinfo
 
 # OS
 .DS_Store
