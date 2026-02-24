@@ -3,10 +3,10 @@ services:
     image: mysql:8.4
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${MYSQL_DB:-construction_erp}
-      MYSQL_USER: ${MYSQL_USER:-erp}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-erp}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${APP_MYSQL_DB:-construction_erp}
+      MYSQL_USER: ${APP_MYSQL_USER:-erp}
+      MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD:-erp}
+      MYSQL_ROOT_PASSWORD: ${APP_MYSQL_ROOT_PASSWORD:-root}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -27,9 +27,9 @@ services:
       DJANGO_DEBUG: ${DJANGO_DEBUG:-false}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-127.0.0.1,localhost}
       DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
-      MYSQL_DB: ${MYSQL_DB:-construction_erp}
-      MYSQL_USER: ${MYSQL_USER:-erp}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-erp}
+      MYSQL_DB: ${APP_MYSQL_DB:-construction_erp}
+      MYSQL_USER: ${APP_MYSQL_USER:-erp}
+      MYSQL_PASSWORD: ${APP_MYSQL_PASSWORD:-erp}
       MYSQL_HOST: db
       MYSQL_PORT: 3306
       POSTGRES_DB: ""

@@ -12,6 +12,9 @@ Use **Docker Compose** deployment instead.
 5. Exposed service: `frontend`
 6. Internal service port: `3000`
 
+If you see `unknown instruction: services:` then Dokploy is treating the compose file as a Dockerfile.
+Switch deployment type to **Docker Compose** (or create a Stack) and keep Dockerfile path empty.
+
 ## 2) Required Environment Variables
 
 Set these in Dokploy app env:
@@ -20,10 +23,10 @@ Set these in Dokploy app env:
 - `DJANGO_DEBUG` = `false`
 - `DJANGO_ALLOWED_HOSTS` = your domain and app hostnames
 - `DJANGO_CSRF_TRUSTED_ORIGINS` = `https://your-domain`
-- `MYSQL_DB` = `construction_erp`
-- `MYSQL_USER` = `erp`
-- `MYSQL_PASSWORD` = strong password
-- `MYSQL_ROOT_PASSWORD` = strong password
+- `APP_MYSQL_DB` = `construction_erp`
+- `APP_MYSQL_USER` = `erp`
+- `APP_MYSQL_PASSWORD` = strong password
+- `APP_MYSQL_ROOT_PASSWORD` = strong password
 - `SEED_DEMO_DATA` = `true` (for demo login)
 - `POSTING_V2_MODE` = `compat`
 - `API_V1_READONLY` = `true`
